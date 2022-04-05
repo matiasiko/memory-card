@@ -11,30 +11,31 @@
 
 
 let cardsArray = [{
-    card: 'angular',
-    img: 'img/angular.png',
-}, {
-    card: 'css',
-    img: 'img/css.png',
-}, {
-    card: 'html',
-    img: 'img/html.png',
-}, {
-    card: 'javascript',
-    img: 'img/js.png',
-}, {
-    card: 'laravel',
-    img: 'img/laravel.png',
-}, {
-    card: 'php',
-    img: 'img/php.png',
-}, {
-    card: 'react',
-    img: 'img/react.png',
-}, {
-    card: 'wordpress',
-    img: 'img/wordpress.png',
-}]
+        card: 'angular',
+        img: 'img/angular.png',
+    }, {
+        card: 'css',
+        img: 'img/css.png',
+    }, {
+        card: 'html',
+        img: 'img/html.png',
+    }, {
+        card: 'javascript',
+        img: 'img/js.png',
+    }, {
+        card: 'laravel',
+        img: 'img/laravel.png',
+    }, {
+        card: 'php',
+        img: 'img/php.png',
+    }, {
+        card: 'react',
+        img: 'img/react.png',
+    }, {
+        card: 'wordpress',
+        img: 'img/wordpress.png',
+    }
+]
 
 const gameGridEl = document.querySelector('.memory-container');
 let allCardsArray = cardsArray.concat(cardsArray); // dublicate all cards
@@ -42,7 +43,8 @@ allCardsArray.sort(() => 0.5 - Math.random()) // Random all cards
 let countClick = 0; // Keep track of selected clicks
 let firstGuess;
 let secondGuess;
-let isFlipped;
+let flipCount = 0;
+let lockBoard = false;
 
 
 for (let i = 0; i < allCardsArray.length; i++) {
@@ -62,47 +64,52 @@ for (let i = 0; i < allCardsArray.length; i++) {
     gameGridEl.appendChild(card)
 }
 
-function flipCard() {
-    if (this === firstGuess) return;
-    if (!isFlipped) {
-        isFlipped = true;
-        this.classList.toggle('flip');
-        firstGuess = this;
-        return;
-    }
-    this.classList.toggle('flip');
-    isFlipped = false;
-    secondGuess = this;
-    checkMatch();
-
-}
-
-function checkMatch() {
+function cardMatch() {
     if (firstGuess.dataset.name === secondGuess.dataset.name) {
         disableCards();
-    } else {
-        setTimeout(() => {
-            unFlipCards()
-        }, 500);
+        return
     }
-}
-
-function disableCards() {
-    firstGuess.remove.addEventListener();
-    secondGuess.remove.addEventListener();
+    setTimeout(() => {unFlipCards()}, 1000);
 }
 
 function unFlipCards() {
     firstGuess.classList.remove('flip');
     secondGuess.classList.remove('flip');
+    reset();
 
+}
+
+function disableCards() {
+    firstGuess.removeEventListener('click', flipCard);
+    secondGuess.removeEventListener('click', flipCard);
+    reset();
+}
+
+function reset() {
+    flipCount = 0;
+
+}
+
+function flipCard() {
+    if (flipCount < 2) {
+        flipCount++
+        if (flipCount === 1) {
+            // Assign first guess
+            this.classList.toggle('flip');
+            firstGuess = this;
+        } else {
+            // Assign second guess
+            this.classList.toggle('flip');
+            secondGuess = this;
+
+            cardMatch();
+
+        }
+    }
 }
 
 const cards = document.querySelectorAll('.card');
 cards.forEach(card => card.addEventListener('click', flipCard));
 
-cards.forEach((card) => {
-    card.addEventListener('click', (e) => {});
-});
 // setTimeout(() => {removeCards()}, 1000);
 //   console.log(e.target.parentNode.dataset.name)
